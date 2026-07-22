@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RoadMap, astar } from "@/lib/map";
 import { loadDrivePrefs, saveDrivePrefs } from "@/lib/session-prefs";
+import { NavMapPicker } from "@/components/NavMapPicker";
+import { placeName } from "@/lib/nav-guidance";
 
 export default function NavPage() {
   const router = useRouter();
   const [map, setMap] = useState<RoadMap | null>(null);
-  const [startNodeId, setStart] = useState(0);
-  const [goalNodeId, setGoal] = useState(15);
+  const [startNodeId, setStart] = useState<number | null>(null);
+  const [goalNodeId, setGoal] = useState<number | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -19,79 +21,82 @@ export default function NavPage() {
       .catch(() => setError("맵을 불러오지 못했습니다."));
   }, []);
 
-  const pathOk = useMemo(() => {
-    if (!map) return false;
-    return !!astar(map, startNodeId, goalNodeId);
-  }, [map, startNodeId, goalNodeId]);
+  const pathOk =
+    map != null &&
+    startNodeId != null &&
+    goalNodeId != null &&
+    !!astar(map, startNodeId, goalNodeId);
 
-  function startDrive(quick = false) {
+  function startDrive() {
+    if (startNodeId == null || goalNodeId == null || !map) {
+      setError("출발지와 도착지를 순서대로 선택하세요.");
+      return;
+    }
+    if (!astar(map, startNodeId, goalNodeId)) {
+      setError("경로를 찾을 수 없습니다.");
+      return;
+    }
     const prefs = loadDrivePrefs() ?? {
       vehicleId: "sedan" as const,
       transmission: "auto" as const,
       startNodeId: 0,
       goalNodeId: 15,
     };
-    const next = {
+    saveDrivePrefs({
       ...prefs,
-      startNodeId: quick ? 0 : startNodeId,
-      goalNodeId: quick ? 15 : goalNodeId,
-    };
-    if (!map || !astar(map, next.startNodeId, next.goalNodeId)) {
-      setError("경로를 찾을 수 없습니다.");
-      return;
-    }
-    saveDrivePrefs(next);
+      startNodeId,
+      goalNodeId,
+      mode: "navigate",
+    });
     router.push("/drive");
   }
 
   return (
-    <main className="page">
+    <main className="page nav-page">
       <h1>내비</h1>
-      <p className="sub">여의도 샘플 맵 — 출발/도착 노드를 고르거나 바로 시작하세요.</p>
+      <p className="sub">T맵처럼 출발 → 도착 순으로 지도를 탭한 뒤 안내를 시작하세요.</p>
 
-      <div className="choice-grid cols-2">
-        <label>
-          출발 노드
-          <select
-            value={startNodeId}
-            onChange={(e) => setStart(Number(e.target.value))}
-            disabled={!map}
-          >
-            {(map?.nodes ?? []).map((n) => (
-              <option key={n.id} value={n.id}>
-                #{n.id} ({n.lat.toFixed(4)}, {n.lon.toFixed(4)})
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          도착 노드
-          <select
-            value={goalNodeId}
-            onChange={(e) => setGoal(Number(e.target.value))}
-            disabled={!map}
-          >
-            {(map?.nodes ?? []).map((n) => (
-              <option key={n.id} value={n.id}>
-                #{n.id} ({n.lat.toFixed(4)}, {n.lon.toFixed(4)})
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      {map ? (
+        <NavMapPicker
+          map={map}
+          startNodeId={startNodeId}
+          goalNodeId={goalNodeId}
+          onSelectStart={(id) => {
+            setStart(id);
+            setGoal(null);
+            setError("");
+          }}
+          onSelectGoal={(id) => {
+            setGoal(id);
+            setError("");
+          }}
+          onReset={() => {
+            setStart(null);
+            setGoal(null);
+            setError("");
+          }}
+        />
+      ) : (
+        <p className="sub">맵 로딩…</p>
+      )}
 
-      <p className="sub">
-        경로: {pathOk ? "가능" : map ? "불가" : "맵 로딩…"} · 노드 {map?.nodes.length ?? "—"} · 도로{" "}
-        {map?.edges.length ?? "—"}
-      </p>
+      {startNodeId != null && goalNodeId != null ? (
+        <p className="sub nav-summary">
+          {placeName(startNodeId)} → {placeName(goalNodeId)}
+          {pathOk ? " · 경로 준비됨" : " · 경로 없음"}
+        </p>
+      ) : null}
+
       {error ? <p className="form-error">{error}</p> : null}
 
       <div className="actions">
-        <button type="button" className="btn-primary" onClick={() => startDrive(false)} disabled={!map}>
-          운전 시작
-        </button>
-        <button type="button" className="btn-ghost" onClick={() => startDrive(true)} disabled={!map}>
-          빠른 시작 (0→15)
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={startDrive}
+          disabled={!pathOk}
+        >
+          안내 시작
         </button>
         <button type="button" className="btn-ghost" onClick={() => router.push("/garage")}>
           차고로

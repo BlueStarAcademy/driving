@@ -1,11 +1,17 @@
 export type VehicleId = "compact" | "sedan" | "suv";
 export type Transmission = "auto" | "manual";
+export type SessionMode = "free" | "navigate" | "highway";
+export type TimeOfDay = "day" | "dusk" | "night";
+export type Weather = "clear" | "rain" | "fog";
 
 export type DrivePrefs = {
   vehicleId: VehicleId;
   transmission: Transmission;
   startNodeId: number;
   goalNodeId: number;
+  mode?: SessionMode;
+  timeOfDay?: TimeOfDay;
+  weather?: Weather;
 };
 
 const KEY = "driving_prefs";

@@ -1,10 +1,21 @@
 export type MapNode = { id: number; lat: number; lon: number };
+export type RoadClass = "urban" | "highway" | "ramp" | "toll";
 export type MapEdge = {
   from: number;
   to: number;
   speedKmh: number;
   lanes: number;
   oneway: boolean;
+  roadClass?: RoadClass;
+};
+export type ParkingBay = {
+  id: string;
+  nodeId: number;
+  offsetX: number;
+  offsetZ: number;
+  width: number;
+  depth: number;
+  yaw: number;
 };
 export type RoadMap = {
   name: string;
@@ -14,6 +25,7 @@ export type RoadMap = {
   nodes: MapNode[];
   edges: MapEdge[];
   signals: { nodeId: number; cycleSeconds: number }[];
+  parking?: ParkingBay[];
 };
 
 const R = 6371000;
@@ -42,20 +54,68 @@ export function nodePositions(map: RoadMap) {
 }
 
 export function buildAdjacency(map: RoadMap) {
-  const adj = new Map<number, { to: number; cost: number; speedKmh: number }[]>();
+  const adj = new Map<number, { to: number; cost: number; speedKmh: number; roadClass: RoadClass }[]>();
   const pos = nodePositions(map);
-  const add = (from: number, to: number, speedKmh: number) => {
+  const add = (from: number, to: number, speedKmh: number, roadClass: RoadClass) => {
     const a = pos.get(from)!;
     const b = pos.get(to)!;
     const cost = Math.hypot(a[0] - b[0], a[1] - b[1]);
     if (!adj.has(from)) adj.set(from, []);
-    adj.get(from)!.push({ to, cost, speedKmh });
+    adj.get(from)!.push({ to, cost, speedKmh, roadClass });
   };
   for (const e of map.edges) {
-    add(e.from, e.to, e.speedKmh);
-    if (!e.oneway) add(e.to, e.from, e.speedKmh);
+    const rc = e.roadClass ?? "urban";
+    add(e.from, e.to, e.speedKmh, rc);
+    if (!e.oneway) add(e.to, e.from, e.speedKmh, rc);
   }
   return { adj, pos };
+}
+
+export function speedLimitNear(
+  map: RoadMap,
+  x: number,
+  z: number,
+): { speedKmh: number; roadClass: RoadClass } {
+  const pos = nodePositions(map);
+  let best = Infinity;
+  let speedKmh = 50;
+  let roadClass: RoadClass = "urban";
+  for (const e of map.edges) {
+    const a = pos.get(e.from)!;
+    const b = pos.get(e.to)!;
+    const abx = b[0] - a[0];
+    const abz = b[1] - a[1];
+    const len2 = abx * abx + abz * abz || 1;
+    let t = ((x - a[0]) * abx + (z - a[1]) * abz) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const px = a[0] + abx * t;
+    const pz = a[1] + abz * t;
+    const d = Math.hypot(x - px, z - pz);
+    if (d < best) {
+      best = d;
+      speedKmh = e.speedKmh;
+      roadClass = e.roadClass ?? "urban";
+    }
+  }
+  return { speedKmh, roadClass };
+}
+
+export function nearestSignal(
+  map: RoadMap,
+  x: number,
+  z: number,
+  maxDist = 28,
+): { nodeId: number; cycleSeconds: number; dist: number } | null {
+  const pos = nodePositions(map);
+  let best: { nodeId: number; cycleSeconds: number; dist: number } | null = null;
+  for (const s of map.signals) {
+    const p = pos.get(s.nodeId);
+    if (!p) continue;
+    const d = Math.hypot(x - p[0], z - p[1]);
+    if (d > maxDist) continue;
+    if (!best || d < best.dist) best = { nodeId: s.nodeId, cycleSeconds: s.cycleSeconds, dist: d };
+  }
+  return best;
 }
 
 export function astar(
@@ -119,4 +179,16 @@ export function pathToPoints(map: RoadMap, path: number[]) {
     const p = pos.get(id)!;
     return { id, x: p[0], z: p[1] };
   });
+}
+
+export function parkingWorldPose(map: RoadMap, bay: ParkingBay) {
+  const pos = nodePositions(map);
+  const p = pos.get(bay.nodeId)!;
+  return {
+    x: p[0] + bay.offsetX,
+    z: p[1] + bay.offsetZ,
+    yaw: bay.yaw,
+    width: bay.width,
+    depth: bay.depth,
+  };
 }

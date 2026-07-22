@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 200" fill="none">
+  <defs>
+    <linearGradient id="gasMetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6a7870"/>
+      <stop offset="45%" stop-color="#24302a"/>
+      <stop offset="100%" stop-color="#101814"/>
+    </linearGradient>
+    <linearGradient id="gasRubber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2f4036"/>
+      <stop offset="100%" stop-color="#121a14"/>
+    </linearGradient>
+  </defs>
+  <rect x="50" y="6" width="20" height="62" rx="4" fill="url(#gasMetal)"/>
+  <path d="M30 68h60c8 0 14 6 14 14v96c0 8-6 14-14 14H30c-8 0-14-6-14-14V82c0-8 6-14 14-14z" fill="url(#gasRubber)" stroke="#4a6554" stroke-width="3"/>
+  <path d="M36 92h48M36 112h48M36 132h48M36 152h48M36 172h48" stroke="#1c281f" stroke-width="7" stroke-linecap="round"/>
+  <text x="60" y="195" text-anchor="middle" fill="#c8e0d0" font-size="14" font-family="Arial,sans-serif" font-weight="700">ACCEL</text>
+</svg>
