@@ -1,0 +1,511 @@
+@import "tailwindcss";
+
+:root {
+  --bg0: #0b1210;
+  --bg1: #14201c;
+  --bg2: #1c2e28;
+  --ink: #e7f0ea;
+  --muted: #9bb0a6;
+  --line: rgba(231, 240, 234, 0.14);
+  --accent: #d4a017;
+  --accent-ink: #1a1406;
+  --danger: #e35d5d;
+  --ok: #4ecb8c;
+  --font-display: var(--font-syne), "Arial Narrow", sans-serif;
+  --font-body: var(--font-outfit), "Segoe UI", sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--bg0);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-body);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg0);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+body {
+  background:
+    radial-gradient(1200px 700px at 10% -10%, #1f3a32 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #2a2414 0%, transparent 45%),
+    linear-gradient(165deg, #0b1210 0%, #101a16 45%, #0d1411 100%);
+  background-attachment: fixed;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 48%, rgba(212, 160, 23, 0.08) 50%, transparent 52%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 48px,
+      rgba(231, 240, 234, 0.03) 48px,
+      rgba(231, 240, 234, 0.03) 49px
+    );
+  pointer-events: none;
+  animation: road-drift 18s linear infinite;
+}
+
+@keyframes road-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 0 0, 120px 0;
+  }
+}
+
+.hero-panel {
+  width: min(420px, 100%);
+  position: relative;
+  z-index: 1;
+  animation: rise 0.7s ease-out both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 10vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  margin: 0 0 0.5rem;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.lede {
+  margin: 0 0 1.75rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.auth-form,
+.stack-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.mode-toggle button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.65rem;
+  cursor: pointer;
+}
+
+.mode-toggle button.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(8, 14, 12, 0.75);
+  color: var(--ink);
+  padding: 0.85rem 0.9rem;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+}
+
+.btn-primary,
+.btn-ghost {
+  border: 0;
+  cursor: pointer;
+  padding: 0.95rem 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.form-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.form-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.form-hint code {
+  color: var(--ink);
+}
+
+.page {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+  animation: rise 0.55s ease-out both;
+}
+
+.page h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.03em;
+}
+
+.page .sub {
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+}
+
+.choice-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 720px) {
+  .choice-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .choice-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.choice {
+  text-align: left;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, rgba(28, 46, 40, 0.9), rgba(12, 18, 16, 0.9));
+  color: var(--ink);
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.choice:hover {
+  transform: translateY(-2px);
+}
+
+.choice.selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.choice strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.choice span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.swatch {
+  width: 100%;
+  height: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.7rem 0.4rem;
+  text-align: left;
+}
+
+.admin-table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+}
+
+.badge.ok {
+  color: var(--ok);
+}
+.badge.warn {
+  color: var(--danger);
+}
+
+.drive-root {
+  position: fixed;
+  inset: 0;
+  background: #07100e;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.drive-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.drive-hud > * {
+  pointer-events: auto;
+}
+
+.speedo {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--line);
+}
+
+.mirrors {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mirror {
+  width: 28vw;
+  max-width: 160px;
+  height: 64px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(180deg, #1a2a34, #0d151a);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.mirror::after {
+  content: "";
+  position: absolute;
+  inset: 10% 15%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.gear-row {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.gear-row button {
+  min-width: 48px;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.gear-row button.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+.wheel-zone {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  width: min(220px, 46vw);
+  height: min(220px, 46vw);
+  border-radius: 50%;
+  border: 10px solid #2a2a2a;
+  background:
+    radial-gradient(circle at 50% 50%, #1a1a1a 0 38%, transparent 39%),
+    conic-gradient(from 0deg, #333, #111, #444, #111, #333);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  touch-action: none;
+}
+
+.wheel-zone .hub {
+  position: absolute;
+  inset: 38%;
+  border-radius: 50%;
+  background: #111;
+  border: 2px solid #555;
+}
+
+.pedals {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 1.1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.pedal {
+  width: 64px;
+  height: 110px;
+  border: 1px solid var(--line);
+  background: rgba(20, 20, 20, 0.75);
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  touch-action: none;
+  user-select: none;
+}
+
+.pedal.brake {
+  height: 90px;
+}
+.pedal.gas {
+  background: rgba(40, 70, 50, 0.8);
+  color: var(--ink);
+}
+
+.pedal.pressed {
+  transform: translateY(4px);
+  filter: brightness(1.2);
+}
+
+.nav-chip {
+  position: absolute;
+  top: 3.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--line);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.top-left-actions {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 3;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .mirror {
+    height: 48px;
+  }
+  .wheel-zone {
+    width: min(160px, 34vw);
+    height: min(160px, 34vw);
+    bottom: 0.5rem;
+  }
+  .pedals {
+    bottom: 0.5rem;
+  }
+  .gear-row {
+    bottom: 5.5rem;
+  }
+}
