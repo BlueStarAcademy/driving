@@ -31,12 +31,14 @@ npm run dev
 
 ## Railway
 
-1. 이 저장소를 **웹 서비스 하나**로 연결 (구 `server`/`admin` Dockerfile은 폐기됨)
+1. 이 저장소를 **웹 서비스 하나**로 연결 (루트 `Dockerfile` / `railway.toml` 사용; 구 `server`/`admin` 폐기)
 2. Postgres 플러그인 추가 → `DATABASE_URL` 주입
 3. 환경변수: `JWT_SECRET`, `SUPER_MASTER_EMAIL`, `SUPER_MASTER_PASSWORD`
 4. 배포 시 엔트리포인트가 `prisma migrate deploy` + 시드 후 `next start`
 
-기존 Railway URL은 코드와 분리되어 있으므로 **새 앱 기준으로 다시 연결**하세요.
+프로덕션(재연결 후): https://driving-production-bf13.up.railway.app
+
+구 admin 서비스(`admin-production-2007`)는 더 이상 필요하지 않습니다. 대시보드는 앱의 `/admin`을 사용하세요.
 
 ## PWA
 
